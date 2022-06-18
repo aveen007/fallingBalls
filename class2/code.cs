@@ -78,7 +78,7 @@ namespace class2
          public double blockt = 3;
          public double cloudt = 3;
          public double probarT = 1;
-         public double rainballT = 17;
+         public double rainballT = 1;
          public float ballSpead = -0.05f;
          public float blockSpead = -0.05f;
          public int animIndex = 0;
@@ -219,7 +219,7 @@ namespace class2
                     coughtRain = false;
                     animIndex = 0;
                 }
-                if(coughtRain)
+                if (coughtRain && animIndex <= 3)
                 {
                     System.Threading.Timer timer = new System.Threading.Timer((ev) =>
                     {
@@ -537,7 +537,7 @@ namespace class2
             {
                 if (coughtRain)
                 {
-                    progressBar.DrawComplexShape(animTextureIndexs[animIndex], )
+                    progressBar.DrawComplexShape(animTextureIndexs[animIndex].X, animTextureIndexs[animIndex].Y, 0.25f, 0.75f);
 
                 }
                 foreach (Shape cloud in clouds.ToList())
@@ -545,7 +545,7 @@ namespace class2
 
                     cloud.DrawShape();
                 }
-                foreach (Shape block in blocks.ToList())
+                foreach (Shape block in blocks.ToList()) 
                 {
                     block.DrawShape();
                 }
