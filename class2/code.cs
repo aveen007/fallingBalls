@@ -23,9 +23,11 @@ namespace class2
         public static Vector2[] animTextureIndexs = 
         {
         new Vector2(0f,0f),
-        new Vector2(0.25f,0f),
-        new Vector2(0.50f,0f),
-        new Vector2(0.75f,0f),
+        new Vector2(0.2f,0f),
+        new Vector2(0.40f,0f),
+        new Vector2(0.6f,0f),
+        new Vector2(0.8f,0f),
+        
         };
 
         //cooredinates
@@ -40,11 +42,11 @@ namespace class2
       public  bool cloudFlag = false;
       public  bool restartFlag = false;
       public  bool dead = false;
-      public  bool pauseFlag = false;
+      public bool pauseFlag = false;
+      public bool AprogressFlag = false;
 
         bool    rainBallFlag = false;
         bool coughtRain = false;
-     
 
         //randoms
         Random rnd = new Random();
@@ -77,16 +79,79 @@ namespace class2
          public double t = 5;
          public double blockt = 3;
          public double cloudt = 3;
-         public double probarT = 1;
-         public double rainballT = 1;
+         public double probarT = 2;
+         public double rainballT = 10;
          public float ballSpead = -0.05f;
          public float blockSpead = -0.05f;
          public int animIndex = 0;
-       //  public float baSpead = -0.05f;
+         //something
+         System.Threading.Timer timerRain;
+         System.Threading.Timer timerBall;
+         System.Threading.Timer timerBlock;
+         System.Threading.Timer timerRainball;
+         System.Threading.Timer timerCloud;
+        
+         //timespan
+         TimeSpan startTimeSpan;
+         TimeSpan periodTimeSpan;
+         TimeSpan startTimeSpanB;
+         TimeSpan periodTimeSpanB ;
+         TimeSpan startTimeSpanC ;
+         TimeSpan periodTimeSpanC ;
+         TimeSpan periodTimeSpanR;
+         TimeSpan periodTimeSpanP;
+        public Program() : base(WIDTH, HEIGHT, GraphicsMode.Default, TITLE) {
 
-        public Program() : base(WIDTH, HEIGHT, GraphicsMode.Default, TITLE) { }
+     //       startGame();
+         
+        }
 
+        public void startGame()
+        {
 
+            System.Threading.Timer timer = new System.Threading.Timer((ev) =>
+            {
+                double sample1 = rnd.NextDouble();
+                double scaled1 = (sample1 * range) + min;
+                ballX = (float)scaled1;
+                ballY = 1f;
+
+                Vector3 start_Ball = new Vector3(ballX, ballY, 0f);
+
+                Shape ball = new Shape(start_Ball, 0.1f, 0.1f, balltex);
+                try {
+                    balls.Add(ball);
+                }
+                catch { }
+            
+            }, null, startTimeSpan, periodTimeSpan);
+
+        }
+        public void ProgressBar()
+        {
+            if (AprogressFlag)
+            {
+                AprogressFlag = false;
+                timerRain = new System.Threading.Timer((ev) =>
+                {
+                    if (animIndex <= 4)
+                    {
+                        animIndex++;
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        try {
+                            timerRain.Dispose();
+                        }
+                        catch { }
+                        timerRain = null;
+                    }
+
+                }, null, startTimeSpan, periodTimeSpanP);
+
+            }
+        }
         protected override void OnLoad(EventArgs e)
         {
 
@@ -143,52 +208,20 @@ namespace class2
 
         }
         bool spacePressed = false;
-        //KeyboardState keyboardState, lastKeyboardState;
-        //public bool KeyPress(Key key)
-        //{
-        //    //return (keyboardState[key] && (keyboardState[key] != lastKeyboardState[key]));
-        //    if (Keyboard[key])
-        //    {
-        //        spacePressed = true;
-        //    }
-        //    else
-        //    {
-        //        spacePressed = false;
-        //    }
-        //    return spacePressed;
-        //}
-        public void addToShapeList(Random rand, double range, double min, Shape shape,List<Shape> List , System.Threading.Timer Timer,double t)
-        {
-              var startTimeSpan = TimeSpan.Zero;
-            var periodTimeSpan = TimeSpan.FromSeconds(t);
-
-            System.Threading.Timer timer = new System.Threading.Timer((ev) =>
-            {
-                double sample1 = rand.NextDouble();
-                double scaled1 = (sample1 * range) + min;
-              float  X = (float)scaled1;
-               float Y = 1f;
-
-                Vector3 start = new Vector3(X, Y, 0f);
-
-                 shape = new Shape(start, shape.width, shape.height, shape.texture);
-                List.Add(shape);
-            }, null, startTimeSpan, periodTimeSpan);
-
-        }
+     
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
 
-            //timespan
-            var startTimeSpan = TimeSpan.Zero;
-            var periodTimeSpan = TimeSpan.FromSeconds(t);
-            var startTimeSpanB = TimeSpan.Zero;
-            var periodTimeSpanB = TimeSpan.FromSeconds(blockt);
-            var startTimeSpanC = TimeSpan.Zero;
-            var periodTimeSpanC = TimeSpan.FromSeconds(cloudt);
-            var periodTimeSpanR = TimeSpan.FromSeconds(rainballT);
-            var periodTimeSpanP = TimeSpan.FromSeconds(probarT);
+            ////timespan
+            startTimeSpan = TimeSpan.Zero;
+            periodTimeSpan = TimeSpan.FromSeconds(t);
+            startTimeSpanB = TimeSpan.Zero;
+            periodTimeSpanB = TimeSpan.FromSeconds(blockt);
+            startTimeSpanC = TimeSpan.Zero;
+            periodTimeSpanC = TimeSpan.FromSeconds(cloudt);
+            periodTimeSpanR = TimeSpan.FromSeconds(rainballT);
+            periodTimeSpanP = TimeSpan.FromSeconds(probarT);
            
             //move  balls
             if (!pauseFlag && !dead)
@@ -197,7 +230,7 @@ namespace class2
                 {
                     ballFlag = true;
 
-                    System.Threading.Timer timer = new System.Threading.Timer((ev) =>
+                    timerBall = new System.Threading.Timer((ev) =>
                     {
                         double sample1 = rnd.NextDouble();
                         double scaled1 = (sample1 * range) + min;
@@ -209,23 +242,20 @@ namespace class2
                         Shape ball = new Shape(start_Ball, 0.1f, 0.1f, balltex);
                         balls.Add(ball);
                     }, null, startTimeSpan, periodTimeSpan);
-              //      addToShapeList(rnd,range,min,ball,balls,new System.Threading.Timer (),t)
 
 
                 }
                 //cought a rainball
-                if (animIndex > 3)
+                if (animIndex > 4)
                 {
                     coughtRain = false;
                     animIndex = 0;
                 }
-                if (coughtRain && animIndex <= 3)
-                {
-                    System.Threading.Timer timer = new System.Threading.Timer((ev) =>
-                    {
-                        animIndex++;
-                    }, null, startTimeSpan, periodTimeSpanR);
+            
 
+                if (coughtRain && animIndex <= 4)
+                {
+                    ProgressBar();
                 }
                 //move rainballs
                 if (!pauseFlag && !dead)
@@ -234,7 +264,7 @@ namespace class2
                     {
                         rainBallFlag = true;
 
-                        System.Threading.Timer timer = new System.Threading.Timer((ev) =>
+                         timerRainball= new System.Threading.Timer((ev) =>
                         {
                             double sample1 = rndm.NextDouble();
                             double scaled1 = (sample1 * range) + min;
@@ -246,7 +276,6 @@ namespace class2
                             Shape rainBall = new Shape(start_rainBall, 0.1f, 0.1f, rainBalltex);
                             balls.Add(rainBall);
                         }, null, startTimeSpan, periodTimeSpanR);
-                        //      addToShapeList(rnd,range,min,ball,balls,new System.Threading.Timer (),t)
 
 
                     }
@@ -257,7 +286,7 @@ namespace class2
                 {
                     blockFlag = true;
 
-                    System.Threading.Timer timer1 = new System.Threading.Timer((ev1) =>
+                    timerBlock = new System.Threading.Timer((ev1) =>
                     {
                         double sample1 = rand.NextDouble();
                         double scaled1 = (sample1 * range) + min;
@@ -274,7 +303,7 @@ namespace class2
                 {
                     cloudFlag = true;
 
-                    System.Threading.Timer timer2 = new System.Threading.Timer((ev2) =>
+                   timerCloud = new System.Threading.Timer((ev2) =>
                     {
                         double sample1 = randC.NextDouble();
                         double scaled1 = (sample1 * range) + min;
@@ -427,9 +456,10 @@ namespace class2
                         ballX = (float)scaled1;
                         ball.setIndexes(ballX, ballY);
                         balls.Remove(ball);
-                        if (ball.texture == rainBalltex)
+                        if ((ball.texture == rainBalltex)&&!coughtRain)
                         {
                             coughtRain = true;
+                            AprogressFlag = true;
                         }
                     }
                 }
@@ -458,6 +488,15 @@ namespace class2
                 }
                 if (pauseFlag)
                 {
+                    try {
+                        timerBall.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerBlock.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerRain.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerCloud.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerRainball.Change(Timeout.Infinite, Timeout.Infinite);
+                    }
+                    catch { }
+                  
                         Vector3 start_pause = new Vector3(-0.4f, 0.4f, 0f);
                     if (Mouse.X < 380 && Mouse.X > 220 && Mouse.Y > 240 && Mouse.Y < 400)
                     {
@@ -484,11 +523,25 @@ namespace class2
                     ballFlag = false;
                     rainBallFlag = false;
                     restartFlag = true;
+
                     //Thread.Sleep(20);
                 }
                 //restart case
                 if (dead)
                 {
+                    try
+                    {
+                        timerBall.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerBlock.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerRain.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerCloud.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerRainball.Change(Timeout.Infinite, Timeout.Infinite);
+                    }
+                    catch { }
+                  
+                    ///////
+                    coughtRain = false;
+                    animIndex = 0;
                     score = 0;
                     previosLevel = 0;
                      t = 5;
@@ -535,9 +588,9 @@ namespace class2
             background.DrawShape();
             if (!dead )
             {
-                if (coughtRain)
+                if (coughtRain&&animIndex<=3)
                 {
-                    progressBar.DrawComplexShape(animTextureIndexs[animIndex].X, animTextureIndexs[animIndex].Y, 0.25f, 0.75f);
+                    progressBar.DrawComplexShape(animTextureIndexs[animIndex].X, animTextureIndexs[animIndex].Y, 0.1f, 1f);
 
                 }
                 foreach (Shape cloud in clouds.ToList())
