@@ -77,12 +77,12 @@ namespace class2
          public Shape restart;
          public static bool dir = true;
          public double t = 5;
-         public double blockt = 3;
+         public double blockt = 10;
          public double cloudt = 3;
          public double probarT = 2;
-         public double rainballT = 10;
-         public float ballSpead = -0.05f;
-         public float blockSpead = -0.05f;
+         public double rainballT = 15;
+         public float ballSpead = -0.03f;
+         public float blockSpead = -0.01f;
          public int animIndex = 0;
          //something
          System.Threading.Timer timerRain;
@@ -340,6 +340,7 @@ namespace class2
                         }
                         else
                         {
+                            if(ball.texture!=rainBalltex)
                             looseBalls--;
                         }
 
@@ -484,6 +485,15 @@ namespace class2
                     b = Keyboard[Key.Space];
                     Thread.Sleep(20);
                     b = Keyboard[Key.Space];
+                    try
+                    {
+                        timerBall.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerBlock.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerRain.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerCloud.Change(Timeout.Infinite, Timeout.Infinite);
+                        timerRainball.Change(Timeout.Infinite, Timeout.Infinite);
+                    }
+                    catch { }
                   
                 }
                 if (pauseFlag)
@@ -547,8 +557,8 @@ namespace class2
                      t = 5;
                      blockt = 3;
                      cloudt = 3;
-                     ballSpead = -0.05f;
-                     blockSpead = -0.05f;
+                     ballSpead = -0.03f;
+                     blockSpead = -0.01f;
                      balls = new List<Shape>();
                      blocks = new List<Shape>();
                     Vector3 start_pause = new Vector3(-0.4f, 0.4f, 0f);
